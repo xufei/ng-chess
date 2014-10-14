@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Chinese chess with angularjs and svg</title>
+	<script type="text/javascript" src="libs/angular.min.js"></script>
+	<script type="text/javascript" src="js/chess.js"></script>
+</head>
+<body ng-app="ng-chinese-chess">
+<div ng-controller="ChessCtrl">
+	<div>
+		<div ng-include="'partials/chessboard.xml'"></div>
+	</div>
+</div>
+</body>
+</html>
