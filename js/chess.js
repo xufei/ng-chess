@@ -27,12 +27,20 @@ angular.module("ng-chinese-chess", [])
                 $scope.games.push(game);
             };
 
-            $scope.x = function (chess) {
+            $scope.chessX = function (chess) {
                 return offsetX + chess.x * gridSize;
             };
 
-            $scope.y = function (chess) {
+            $scope.chessY = function (chess) {
                 return offsetY + chess.y * gridSize;
+            };
+
+            $scope.placeX = function (chess) {
+                return offsetX + (chess.x-0.5) * gridSize;
+            };
+
+            $scope.placeY = function (chess) {
+                return offsetY + (chess.y-0.5) * gridSize;
             };
 
             var colors = {
@@ -48,8 +56,8 @@ angular.module("ng-chinese-chess", [])
                 return "#" + colors[chess.color] + "-" + types[chess.type];
             };
 
-            $scope.chessClick = function (chess) {
-                alert(chess.type);
+            $scope.chessClick = function (game, chess) {
+                game.select(chess);
             };
         }])
     .factory("ChessMan", [function () {
@@ -582,6 +590,7 @@ angular.module("ng-chinese-chess", [])
             this.generals = [];
 
             this.chesses = [];
+            this.moveablePlaces = [];
         }
 
         Game.prototype = {
@@ -591,18 +600,10 @@ angular.module("ng-chinese-chess", [])
                 }
 
                 for (var i = 0; i < chesses.length; i++) {
-                    this.createChess(chesses[i]);
-                }
+                    var chess = this.createChess(chesses[i]);
 
-                var that = this;
-                angular.forEach(chesses, function (arr) {
-                    that.chesses.push({
-                        color: arr[0],
-                        type: arr[1],
-                        x: arr[2],
-                        y: arr[3]
-                    });
-                });
+                    this.chesses.push(chess);
+                }
             },
 
             destroy: function () {
@@ -658,10 +659,6 @@ angular.module("ng-chinese-chess", [])
                         }
 
                         if (canKill) {
-                            this.chessBoard.clearBlank();
-                            this.chessBoard.clearAttack();
-                            this.chessBoard.removeChess(chess.x, chess.y);
-                            this.chessBoard.moveChess(this.currentChess.x, this.currentChess.y, chess.x, chess.y);
                             this.moveChess(this.currentChess, chess.x, chess.y, false);
 
                             if (chess.type == Type.GENERAL) {
@@ -685,13 +682,13 @@ angular.module("ng-chinese-chess", [])
                 }
 
                 this.currentChess = chess;
-                var whereCanIGo = [];
+                this.moveablePlaces = [];
                 this.chessUnderAttack = [];
                 for (var i = 0; i < 9; i++) {
                     for (var j = 0; j < 10; j++) {
                         if (chess.canGo(i, j)) {
                             if (this.isEmpty(i, j)) {
-                                whereCanIGo.push({
+                                this.moveablePlaces.push({
                                     x: i,
                                     y: j
                                 });
