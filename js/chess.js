@@ -12,6 +12,22 @@ angular.module("ng-chinese-chess", [])
         SOLDIER: 1,
         BLANK: 0
     })
+    .value("ChessText", {
+        14: "帅",
+        13: "仕",
+        12: "相",
+        11: "馬",
+        10: "車",
+        9: "砲",
+        8: "兵",
+        7: "将",
+        6: "士",
+        5: "象",
+        4: "马",
+        3: "车",
+        2: "炮",
+        1: "卒"
+    })
     .value("ChessColor", {
         RED: 1,
         BLACK: -1,
@@ -35,11 +51,19 @@ angular.module("ng-chinese-chess", [])
                 return offsetY + chess.y * gridSize;
             };
 
-            $scope.placeX = function (chess) {
+            $scope.canGoX = function (chess) {
                 return offsetX + (chess.x-0.5) * gridSize;
             };
 
-            $scope.placeY = function (chess) {
+            $scope.canGoY = function (chess) {
+                return offsetY + (chess.y-0.5) * gridSize;
+            };
+
+            $scope.canAttackX = function (chess) {
+                return offsetX + (chess.x-0.5) * gridSize;
+            };
+
+            $scope.canAttackY = function (chess) {
                 return offsetY + (chess.y-0.5) * gridSize;
             };
 
@@ -51,13 +75,8 @@ angular.module("ng-chinese-chess", [])
 
             var types = ["blank", "soldier", "cannon", "chariot", "horse", "staff", "guard", "general"];
 
-
             $scope.symbol = function (chess) {
                 return "#" + colors[chess.color] + "-" + types[chess.type];
-            };
-
-            $scope.chessClick = function (game, chess) {
-                game.select(chess);
             };
         }])
     .factory("ChessMan", [function () {
@@ -541,7 +560,7 @@ angular.module("ng-chinese-chess", [])
 
         return ChessFactory;
     }])
-    .factory("Game", ["ChessFactory", "ChessType", "ChessColor", function(Factory, Type, Color) {
+    .factory("Game", ["ChessFactory", "ChessType", "ChessColor", "ChessText", function(Factory, Type, Color, Text) {
         //color, type, x, y
         var chesses = [
             [1, 7, 4, 9],
@@ -642,11 +661,28 @@ angular.module("ng-chinese-chess", [])
                 return this.situation[x][y];
             },
 
-            select: function (chess) {
+            checkFinish: function() {
                 if (this.currentColor == Color.GREY) {
                     this.prompt("棋局已终止！");
+                    return true;
+                }
+                return false;
+            },
+
+            checkCurrentColor: function(chess) {
+                if (chess.color != this.currentColor) {
+                    this.prompt("不该你走！");
+                    return true;
+                }
+                return false;
+            },
+
+            attack: function (position) {
+                if (this.checkFinish()) {
                     return;
                 }
+
+                var chess = this.situation[position.x][position.y];
 
                 if (this.currentChess) {
                     if (this.currentChess.color + chess.color == 0) {
@@ -675,10 +711,16 @@ angular.module("ng-chinese-chess", [])
                     }
                 }
                 else {
-                    if (chess.color != this.currentColor) {
-                        this.prompt("不该你走！");
-                        return;
-                    }
+                }
+            },
+
+            select: function(chess) {
+                if (this.checkFinish()) {
+                    return;
+                }
+
+                if (this.checkCurrentColor(chess)) {
+                    return;
                 }
 
                 this.currentChess = chess;
@@ -704,14 +746,21 @@ angular.module("ng-chinese-chess", [])
                 }
             },
 
+            moveTo: function(position) {
+                this.moveChess(this.currentChess, position.x, position.y);
+                this.moveablePlaces = [];
+                this.chessUnderAttack = [];
+            },
+
             moveChess: function (chess, newX, newY, isUndo) {
+                var dead = this.situation[newX][newY];
                 var step = {
                     chess: chess,
                     from: {
                         x: chess.x,
                         y: chess.y
                     },
-                    dead: this.situation[newX][newY]
+                    dead: dead
                 };
 
                 if (isUndo) {
@@ -726,8 +775,20 @@ angular.module("ng-chinese-chess", [])
                 chess.y = newY;
                 this.situation[newX][newY] = chess;
 
+                if (dead) {
+                    for (var i=0; i<this.chesses.length; i++) {
+                        if (dead == this.chesses[i]) {
+                            this.chesses.splice(i, 1);
+                            break;
+                        }
+                    }
+                }
+
                 this.currentColor = Color.RED + Color.BLACK - this.currentColor;
+
                 this.currentChess = null;
+                this.moveablePlaces = [];
+                this.chessUnderAttack = [];
 
                 this.log(step);
                 this.check();

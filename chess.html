@@ -14,8 +14,12 @@
 <svg height="620" version="1.1" width="560" xmlns="http://www.w3.org/2000/svg">
     <desc>Chinese Chess</desc>
     <defs>
-        <g id="cango">
-            <rect x="15" y="15" width="30" height="30" fill="none" stroke="#3333aa"
+        <g id="canGo">
+            <rect x="15" y="15" width="30" height="30" fill="#3333aa" stroke="#3333aa"
+                  stroke-width="3"></rect>
+        </g>
+        <g id="canAttack">
+            <rect x="5" y="5" width="50" height="50" fill="#ff0000" stroke="#ff0000"
                   stroke-width="3"></rect>
         </g>
         <g id="red-general">
@@ -229,9 +233,11 @@
     <path fill="none" stroke="#000000" d="M514,406L499,406"></path>
 
     <use ng-repeat="chess in game.chesses" ng-attr-x="{{chessX(chess)}}" ng-attr-y="{{chessY(chess)}}" xlink:href="{{symbol(chess)}}"
-         ng-click="chessClick(game, chess)"></use>
-    <use ng-repeat="position in game.moveablePlaces" ng-attr-x="{{placeX(position)}}" ng-attr-y="{{placeY(position)}}" xlink:href="#cango"
-         ng-click="move(position)"></use>
+         ng-click="game.select(chess)"></use>
+    <use ng-repeat="position in game.moveablePlaces" ng-attr-x="{{canGoX(position)}}" ng-attr-y="{{canGoY(position)}}" xlink:href="#canGo"
+         ng-click="game.moveTo(position)"></use>
+    <use ng-repeat="position in game.chessUnderAttack" ng-attr-x="{{canAttackX(position)}}" ng-attr-y="{{canAttackY(position)}}" xlink:href="#canAttack"
+         ng-click="game.attack(position)"></use>
 </svg>
 </div>
 </div>
