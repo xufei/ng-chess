@@ -33,14 +33,30 @@ angular.module("ng-chinese-chess", [])
         BLACK: -1,
         GREY: 0
     })
-    .controller("ChessCtrl", ["$scope", "offsetX", "offsetY", "gridSize", "Game",
-        function ($scope, offsetX, offsetY, gridSize, Game) {
+    .factory("Room", [function() {
+        AV.initialize("otn34r0bvc0d5aaa5mobl9sxl5fsetlyz9qppy28ct27knqs", "5mf4ovdrhsisghd4ac0lk7yhhlj0qgkoirwsdj9z69d98gz5");
+        // 初始化 param1：应用 id、param2：应用 key
+
+        var Room = AV.Object.extend("Room");
+
+        return Room;
+    }])
+    .controller("ChessCtrl", ["$scope", "offsetX", "offsetY", "gridSize", "Game", "Room",
+        function ($scope, offsetX, offsetY, gridSize, Game, Room) {
+            var room = new Room();
+
             $scope.games = [];
 
             $scope.createGame = function() {
                 var game = new Game();
                 game.init();
                 $scope.games.push(game);
+
+                room.save(game.serialize(), {
+                    success: function(object) {
+                        alert("LeanCloud works!");
+                    }
+                });
             };
 
             $scope.chessX = function (chess) {
@@ -65,6 +81,18 @@ angular.module("ng-chinese-chess", [])
 
             $scope.canAttackY = function (chess) {
                 return offsetY + (chess.y-0.5) * gridSize;
+            };
+
+            $scope.select = function(game, chess) {
+                game.select(chess);
+            };
+
+            $scope.move = function(game, position) {
+                game.moveTo(position)
+            };
+
+            $scope.attack = function(game, position) {
+                game.attack(position);
             };
 
             var colors = {
@@ -599,6 +627,8 @@ angular.module("ng-chinese-chess", [])
         ];
 
         function Game() {
+            this.initialState = chesses;
+
             this.situation = [];
             this.currentColor = Color.RED;
             this.currentChess = null;
@@ -840,24 +870,32 @@ angular.module("ng-chinese-chess", [])
                 console.log(text);
             },
 
+            executeStep: function(step) {
+                this.moveChess(step.chess, step.from.x, step.from.y);
+
+                if (step.dead) {
+                    this.situation[step.chess.x][step.chess.y] = step.dead;
+                }
+            },
+
             undo: function () {
                 if (this.undoList.length > 0) {
                     var step = this.undoList.pop();
-                    this.chessBoard.moveChess(step.chess.x, step.chess.y, step.from.x, step.from.y);
-                    this.moveChess(step.chess, step.from.x, step.from.y, true);
-
-                    if (step.dead) {
-                        this.situation[step.chess.x][step.chess.y] = step.dead;
-                        this.chessBoard.drawChess(step.dead);
-                    }
+                    this.executeStep(step);
                 }
             },
 
             redo: function () {
                 if (this.redoList.length > 0) {
                     var step = this.redoList.pop();
-                    this.chessBoard.moveChess(step.chess.x, step.chess.y, step.from.x, step.from.y);
-                    this.moveChess(step.chess, step.from.x, step.from.y);
+                    this.executeStep(step);
+                }
+            },
+
+            serialize: function() {
+                return {
+                    initialState: this.initialState,
+                    active: this.currentColor!=Color.GREY
                 }
             }
         };

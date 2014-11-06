@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Chinese chess with angularjs and svg</title>
     <script type="text/javascript" src="libs/angular.min.js"></script>
+    <script src="https://leancloud.cn/scripts/lib/av-0.4.5.min.js"></script>
     <script type="text/javascript" src="js/chess.js"></script>
 </head>
 <body ng-app="ng-chinese-chess">
@@ -233,11 +234,11 @@
     <path fill="none" stroke="#000000" d="M514,406L499,406"></path>
 
     <use ng-repeat="chess in game.chesses" ng-attr-x="{{chessX(chess)}}" ng-attr-y="{{chessY(chess)}}" xlink:href="{{symbol(chess)}}"
-         ng-click="game.select(chess)"></use>
+         ng-click="select(game, chess)"></use>
     <use ng-repeat="position in game.moveablePlaces" ng-attr-x="{{canGoX(position)}}" ng-attr-y="{{canGoY(position)}}" xlink:href="#canGo"
-         ng-click="game.moveTo(position)"></use>
+         ng-click="move(game, position)"></use>
     <use ng-repeat="position in game.chessUnderAttack" ng-attr-x="{{canAttackX(position)}}" ng-attr-y="{{canAttackY(position)}}" xlink:href="#canAttack"
-         ng-click="game.attack(position)"></use>
+         ng-click="attack(game, position)"></use>
 </svg>
 </div>
 </div>
