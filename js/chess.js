@@ -33,16 +33,32 @@ angular.module("ng-chinese-chess", [])
         BLACK: -1,
         GREY: 0
     })
-    .factory("Room", [function() {
+    .config(function () {
         AV.initialize("otn34r0bvc0d5aaa5mobl9sxl5fsetlyz9qppy28ct27knqs", "5mf4ovdrhsisghd4ac0lk7yhhlj0qgkoirwsdj9z69d98gz5");
         // 初始化 param1：应用 id、param2：应用 key
+    })
+    .factory("Room", [function () {
+        var Step = AV.Object.extend("Step");
 
-        var Room = AV.Object.extend("Room");
+        var Room = AV.Object.extend("Room", {
+            addStep : function(data) {
+                var step = new Step();
+
+                step.set("chess", data.chess);
+                step.set("fromX", data.fromX);
+                step.set("fromY", data.fromY);
+                step.set("toX", data.toX);
+                step.set("toY", data.toY);
+                step.set("parent", this);
+
+                step.save();
+            }
+        });
 
         return Room;
     }])
-    .Service("UserService", ["$q", function($q) {
-        this.signUp = function(username, password, email) {
+    .service("UserService", ["$q", function ($q) {
+        this.signUp = function (username, password, email) {
             var defer = $q.defer();
 
             var user = new AV.User();
@@ -53,11 +69,11 @@ angular.module("ng-chinese-chess", [])
             // other fields can be set just like with AV.Object
             //user.set("phone", "415-392-0202");
             user.signUp(null, {
-                success: function(user) {
+                success: function (user) {
                     // Hooray! Let them use the app now.
                     defer.resolve(user);
                 },
-                error: function(user, error) {
+                error: function (user, error) {
                     // Show the error message somewhere and let the user try again.
                     defer.resolve(error);
                     alert("Error: " + error.code + " " + error.message);
@@ -67,15 +83,15 @@ angular.module("ng-chinese-chess", [])
             return defer.promise;
         };
 
-        this.login = function(username, password) {
+        this.login = function (username, password) {
             var defer = $q.defer();
 
             AV.User.logIn(username, password, {
-                success: function(user) {
+                success: function (user) {
                     // Do stuff after successful login.
                     defer.resolve(user);
                 },
-                error: function(user, error) {
+                error: function (user, error) {
                     // The login failed. Check error to see why.
                     defer.resolve(error);
                 }
@@ -84,28 +100,37 @@ angular.module("ng-chinese-chess", [])
             return defer.promise;
         };
 
-        this.currentUser = function() {
+        this.currentUser = function () {
             return AV.user.current;
         };
     }])
-    .controller("UserCtrl", ["$scope", "UserService", function($scope, UserService) {
-        $scope.signUp = function() {
+    .service("LeanCloudLogger", [function () {
+        return {
+            log: function (step) {
+
+            }
+        };
+    }])
+    .controller("UserCtrl", ["$scope", "UserService", function ($scope, UserService) {
+        $scope.signUp = function () {
             UserService.signUp();
         };
     }])
-    .controller("ChessCtrl", ["$scope", "offsetX", "offsetY", "gridSize", "Game", "Room",
-        function ($scope, offsetX, offsetY, gridSize, Game, Room) {
+    .controller("ChessCtrl", ["$scope", "offsetX", "offsetY", "gridSize", "Game", "Room", "ConsoleLogger",
+        function ($scope, offsetX, offsetY, gridSize, Game, Room, ConsoleLogger) {
             var room = new Room();
 
             $scope.games = [];
 
-            $scope.createGame = function() {
+            $scope.createGame = function () {
                 var game = new Game();
                 game.init();
+
+                game.addLogger(ConsoleLogger);
                 $scope.games.push(game);
 
                 room.save(game.serialize(), {
-                    success: function(object) {
+                    success: function (object) {
                         alert("LeanCloud works!");
                     }
                 });
@@ -120,30 +145,36 @@ angular.module("ng-chinese-chess", [])
             };
 
             $scope.canGoX = function (chess) {
-                return offsetX + (chess.x-0.5) * gridSize;
+                return offsetX + (chess.x - 0.5) * gridSize;
             };
 
             $scope.canGoY = function (chess) {
-                return offsetY + (chess.y-0.5) * gridSize;
+                return offsetY + (chess.y - 0.5) * gridSize;
             };
 
             $scope.canAttackX = function (chess) {
-                return offsetX + (chess.x-0.5) * gridSize;
+                return offsetX + (chess.x - 0.5) * gridSize;
             };
 
             $scope.canAttackY = function (chess) {
-                return offsetY + (chess.y-0.5) * gridSize;
+                return offsetY + (chess.y - 0.5) * gridSize;
             };
 
-            $scope.select = function(game, chess) {
+            $scope.select = function (game, chess) {
                 game.select(chess);
             };
 
-            $scope.move = function(game, position) {
-                game.moveTo(position)
+            $scope.move = function (game, position) {
+                game.moveTo(position);
+
+                room.addStep({
+                    chess: "a",
+                    toX: position.x,
+                    toY: position.y
+                });
             };
 
-            $scope.attack = function(game, position) {
+            $scope.attack = function (game, position) {
                 game.attack(position);
             };
 
@@ -640,7 +671,7 @@ angular.module("ng-chinese-chess", [])
 
         return ChessFactory;
     }])
-    .factory("Game", ["ChessFactory", "ChessType", "ChessColor", "ChessText", function(Factory, Type, Color, Text) {
+    .factory("Game", ["ChessFactory", "ChessType", "ChessColor", "ConsoleLogger", function (Factory, Type, Color, ConsoleLogger) {
         //color, type, x, y
         var chesses = [
             [1, 7, 4, 9],
@@ -692,6 +723,8 @@ angular.module("ng-chinese-chess", [])
 
             this.chesses = [];
             this.moveablePlaces = [];
+
+            this.loggers = [];
         }
 
         Game.prototype = {
@@ -743,7 +776,7 @@ angular.module("ng-chinese-chess", [])
                 return this.situation[x][y];
             },
 
-            checkFinish: function() {
+            checkFinish: function () {
                 if (this.currentColor == Color.GREY) {
                     this.prompt("棋局已终止！");
                     return true;
@@ -751,7 +784,7 @@ angular.module("ng-chinese-chess", [])
                 return false;
             },
 
-            checkCurrentColor: function(chess) {
+            checkCurrentColor: function (chess) {
                 if (chess.color != this.currentColor) {
                     this.prompt("不该你走！");
                     return true;
@@ -796,7 +829,7 @@ angular.module("ng-chinese-chess", [])
                 }
             },
 
-            select: function(chess) {
+            select: function (chess) {
                 if (this.checkFinish()) {
                     return;
                 }
@@ -828,7 +861,7 @@ angular.module("ng-chinese-chess", [])
                 }
             },
 
-            moveTo: function(position) {
+            moveTo: function (position) {
                 this.moveChess(this.currentChess, position.x, position.y);
                 this.moveablePlaces = [];
                 this.chessUnderAttack = [];
@@ -858,7 +891,7 @@ angular.module("ng-chinese-chess", [])
                 this.situation[newX][newY] = chess;
 
                 if (dead) {
-                    for (var i=0; i<this.chesses.length; i++) {
+                    for (var i = 0; i < this.chesses.length; i++) {
                         if (dead == this.chesses[i]) {
                             this.chesses.splice(i, 1);
                             break;
@@ -893,6 +926,52 @@ angular.module("ng-chinese-chess", [])
                 alert(text);
             },
 
+            addLogger: function (logger) {
+                this.loggers.push(logger);
+            },
+
+            log: function (step) {
+                angular.forEach(this.loggers, function (logger) {
+                    logger.log(step);
+                });
+            },
+
+            executeStep: function (step) {
+                this.moveChess(step.chess, step.from.x, step.from.y);
+
+                if (step.dead) {
+                    this.situation[step.chess.x][step.chess.y] = step.dead;
+                }
+            },
+
+            undo: function () {
+                if (this.undoList.length > 0) {
+                    var step = this.undoList.pop();
+                    this.executeStep(step);
+                }
+            },
+
+            redo: function () {
+                if (this.redoList.length > 0) {
+                    var step = this.redoList.pop();
+                    this.executeStep(step);
+                }
+            },
+
+            serialize: function () {
+                return {
+                    initialState: this.initialState,
+                    active: this.currentColor != Color.GREY
+                }
+            }
+        };
+
+        return Game;
+    }])
+
+    .service("ConsoleLogger", ["ChessText", function (Text) {
+        var logger = {
+
             log: function (step) {
                 var numbers = ["一", "二", "三", "四", "五", "六", "七", "八", "九"];
                 var directions = ["进", "平", "退"];
@@ -920,37 +999,8 @@ angular.module("ng-chinese-chess", [])
 
                 var text = chessText + numbers[step.from.x] + directions[direction * step.chess.color + 1] + numbers[stepLength];
                 console.log(text);
-            },
-
-            executeStep: function(step) {
-                this.moveChess(step.chess, step.from.x, step.from.y);
-
-                if (step.dead) {
-                    this.situation[step.chess.x][step.chess.y] = step.dead;
-                }
-            },
-
-            undo: function () {
-                if (this.undoList.length > 0) {
-                    var step = this.undoList.pop();
-                    this.executeStep(step);
-                }
-            },
-
-            redo: function () {
-                if (this.redoList.length > 0) {
-                    var step = this.redoList.pop();
-                    this.executeStep(step);
-                }
-            },
-
-            serialize: function() {
-                return {
-                    initialState: this.initialState,
-                    active: this.currentColor!=Color.GREY
-                }
             }
         };
 
-        return Game;
+        return logger;
     }]);
