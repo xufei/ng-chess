@@ -1,4 +1,5 @@
-angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType", "ChessColor", "ConsoleLogger", function (Factory, Type, Color, ConsoleLogger) {
+angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType", "ChessColor", "GameState", "ConsoleLogger",
+    function (Factory, Type, Color, GameState, ConsoleLogger) {
     //color, type, x, y
     var chesses = [
         [1, 7, 4, 9],
@@ -37,10 +38,18 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
     ];
 
     function Game() {
-        this.initialState = chesses;
+        this.initialSituation = chesses;
+
+        this.state = GameState.UNINITIALIZED;
 
         this.situation = [];
-        this.currentColor = Color.RED;
+
+        this.redPlayer = null;
+        this.blackPlayer = null;
+        this.currentPlayer = null;
+
+        this.watchers = [];
+
         this.currentChess = null;
         this.undoList = [];
         this.redoList = [];
@@ -65,6 +74,8 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
 
                 this.chesses.push(chess);
             }
+
+            this.currentPlayer = this.redPlayer;
         },
 
         destroy: function () {
@@ -103,16 +114,8 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
         },
 
         checkFinish: function () {
-            if (this.currentColor == Color.GREY) {
+            if (this.state == GameState.FINISHED) {
                 this.prompt("棋局已终止！");
-                return true;
-            }
-            return false;
-        },
-
-        checkCurrentColor: function (chess) {
-            if (chess.color != this.currentColor) {
-                this.prompt("不该你走！");
                 return true;
             }
             return false;
@@ -141,7 +144,7 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
                         if (chess.type == Type.GENERAL) {
                             var winner = (chess.color == Color.RED) ? "黑" : "红";
                             this.prompt("结束啦，" + winner + "方胜利！");
-                            this.currentColor = Color.GREY;
+                            this.state = GameState.FINISHED;
                         }
                         return;
                     }
@@ -160,7 +163,8 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
                 return;
             }
 
-            if (this.checkCurrentColor(chess)) {
+            if (chess.color != this.currentPlayer.color) {
+                this.prompt("不该你走！");
                 return;
             }
 
@@ -225,7 +229,7 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
                 }
             }
 
-            this.currentColor = Color.RED + Color.BLACK - this.currentColor;
+            this.currentPlayer = (this.currentPlayer == this.redPlayer) ? this.blackPlayer : this.redPlayer;
 
             this.currentChess = null;
             this.moveablePlaces = [];
@@ -262,6 +266,16 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
             });
         },
 
+        addWatcher: function(watcher) {
+            this.watchers.push(watcher);
+        },
+
+        notify: function(step) {
+            angular.forEach(this.watchers, function (watcher) {
+                watcher.notify(step);
+            });
+        },
+
         executeStep: function (step) {
             this.moveChess(step.chess, step.from.x, step.from.y);
 
@@ -286,8 +300,8 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
 
         serialize: function () {
             return {
-                initialState: this.initialState,
-                active: this.currentColor != Color.GREY
+                initialSituation: this.initialSituation,
+                state: this.state
             }
         }
     };

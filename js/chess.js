@@ -32,4 +32,10 @@ angular.module("ng-chinese-chess", [])
         RED: 1,
         BLACK: -1,
         GREY: 0
+    })
+    .value("GameState", {
+        UNINITIALIZED: -1,
+        FINISHED: 0,
+        READY: 1,
+        ACTING: 2
     });
