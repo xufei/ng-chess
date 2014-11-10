@@ -24,7 +24,7 @@ angular.module("ng-chinese-chess").service("UserService", ["$q", function ($q) {
         return defer.promise;
     };
 
-    this.login = function (username, password) {
+    this.signIn = function (username, password) {
         var defer = $q.defer();
 
         AV.User.logIn(username, password, {
