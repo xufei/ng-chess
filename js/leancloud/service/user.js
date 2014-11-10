@@ -44,9 +44,4 @@ angular.module("ng-chinese-chess").service("UserService", ["$q", function ($q) {
     this.currentUser = function () {
         return AV.user.current;
     };
-}])
-    .controller("UserCtrl", ["$scope", "UserService", function ($scope, UserService) {
-        $scope.signUp = function () {
-            UserService.signUp();
-        };
-    }]);
+}]);
