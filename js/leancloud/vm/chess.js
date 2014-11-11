@@ -1,19 +1,34 @@
-angular.module("ng-chinese-chess").controller("ChessCtrl", ["$scope", "offsetX", "offsetY", "gridSize", "Game", "Room", "ConsoleLogger",
-    function ($scope, offsetX, offsetY, gridSize, Game, Room, ConsoleLogger) {
-        var room = new Room();
+angular.module("ng-chinese-chess").controller("ChessCtrl",
+    ["$scope", "offsetX", "offsetY", "gridSize", "ChessColor", "Game", "RoomService", "UserService", "ConsoleLogger",
+    function ($scope, offsetX, offsetY, gridSize, Color, Game, RoomService, UserService, ConsoleLogger) {
+        var room = RoomService.createRoom();
 
-        $scope.games = [];
+        var rooms = RoomService.rooms();
+        $scope.rooms = [];
+
+        rooms.fetch({
+            success: function(collection) {
+                collection.each(function(object) {
+                    $scope.rooms.push(object);
+                });
+
+                $scope.$digest();
+            },
+            error: function(collection, error) {
+                // The collection could not be retrieved.
+            }});
 
         $scope.createGame = function () {
             var game = new Game();
+            var me = UserService.currentUser();
+            game.redPlayer = new Player(me, Color.RED);
             game.init();
 
             game.addLogger(ConsoleLogger);
-            $scope.games.push(game);
 
             room.save(game.serialize(), {
                 success: function (object) {
-                    alert("LeanCloud works!");
+                    alert("Created！");
                 }
             });
         };
@@ -49,7 +64,7 @@ angular.module("ng-chinese-chess").controller("ChessCtrl", ["$scope", "offsetX",
         $scope.move = function (game, position) {
             game.moveTo(position);
 
-            room.addStep({
+            RoomService.addStep(room, {
                 chess: "a",
                 toX: position.x,
                 toY: position.y

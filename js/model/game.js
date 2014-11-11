@@ -299,10 +299,20 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
         },
 
         serialize: function () {
-            return {
+            var json = {
                 initialSituation: this.initialSituation,
                 state: this.state
+            };
+
+            if (this.redPlayer) {
+                json.redPlayer = this.redPlayer.user.name;
             }
+
+            if (this.blackPlayer) {
+                json.blackPlayer = this.blackPlayer.user.name;
+            }
+
+            return json;
         }
     };
 
