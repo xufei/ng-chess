@@ -5,18 +5,15 @@ angular.module("ng-chinese-chess").service("UserService", ["$q", function ($q) {
         var user = new AV.User();
         user.set("username", username);
         user.set("password", password);
-        user.set("email", email);
 
-        // other fields can be set just like with AV.Object
-        //user.set("phone", "415-392-0202");
         user.signUp(null, {
             success: function (user) {
-                // Hooray! Let them use the app now.
+                // 注册成功了哦
                 defer.resolve(user);
             },
             error: function (user, error) {
-                // Show the error message somewhere and let the user try again.
-                defer.resolve(error);
+                // 出错了
+                defer.reject(error);
                 alert("Error: " + error.code + " " + error.message);
             }
         });
@@ -29,19 +26,15 @@ angular.module("ng-chinese-chess").service("UserService", ["$q", function ($q) {
 
         AV.User.logIn(username, password, {
             success: function (user) {
-                // Do stuff after successful login.
+                // 登录成功了
                 defer.resolve(user);
             },
             error: function (user, error) {
-                // The login failed. Check error to see why.
-                defer.resolve(error);
+                // 登录失败
+                defer.reject(error);
             }
         });
 
         return defer.promise;
-    };
-
-    this.currentUser = function () {
-        return AV.user.current;
     };
 }]);

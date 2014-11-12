@@ -17,6 +17,7 @@
     <script type="text/javascript" src="js/model/cannon.js"></script>
     <script type="text/javascript" src="js/model/soldier.js"></script>
     <script type="text/javascript" src="js/service/console.js"></script>
+    <script type="text/javascript" src="js/vm/chessboard.js"></script>
     <script type="text/javascript" src="js/vm/local.js"></script>
 </head>
 <body ng-app="ng-chinese-chess">
@@ -121,129 +122,10 @@
         </g>
     </defs>
 
-    <rect x="40" y="40" width="480" height="540" fill="none" stroke="#000000" stroke-width="3"></rect>
-    <path fill="none" stroke="#000000" d="M40,100L520,100"></path>
-    <path fill="none" stroke="#000000" d="M40,160L520,160"></path>
-    <path fill="none" stroke="#000000" d="M40,220L520,220"></path>
-    <path fill="none" stroke="#000000" d="M40,280L520,280"></path>
-    <path fill="none" stroke="#000000" d="M40,340L520,340"></path>
-    <path fill="none" stroke="#000000" d="M40,400L520,400"></path>
-    <path fill="none" stroke="#000000" d="M40,460L520,460"></path>
-    <path fill="none" stroke="#000000" d="M40,520L520,520"></path>
-    <path fill="none" stroke="#000000" d="M100,40L100,280"></path>
-    <path fill="none" stroke="#000000" d="M100,340L100,580"></path>
-    <path fill="none" stroke="#000000" d="M160,40L160,280"></path>
-    <path fill="none" stroke="#000000" d="M160,340L160,580"></path>
-    <path fill="none" stroke="#000000" d="M220,40L220,280"></path>
-    <path fill="none" stroke="#000000" d="M220,340L220,580"></path>
-    <path fill="none" stroke="#000000" d="M280,40L280,280"></path>
-    <path fill="none" stroke="#000000" d="M280,340L280,580"></path>
-    <path fill="none" stroke="#000000" d="M340,40L340,280"></path>
-    <path fill="none" stroke="#000000" d="M340,340L340,580"></path>
-    <path fill="none" stroke="#000000" d="M400,40L400,280"></path>
-    <path fill="none" stroke="#000000" d="M400,340L400,580"></path>
-    <path fill="none" stroke="#000000" d="M460,40L460,280"></path>
-    <path fill="none" stroke="#000000" d="M460,340L460,580"></path>
-    <path fill="none" stroke="#000000" d="M220,40L340,160"></path>
-    <path fill="none" stroke="#000000" d="M220,460L340,580"></path>
-    <path fill="none" stroke="#000000" d="M340,40L220,160"></path>
-    <path fill="none" stroke="#000000" d="M340,460L220,580"></path>
-    <path fill="none" stroke="#000000" d="M94,139L94,154"></path>
-    <path fill="none" stroke="#000000" d="M94,154L79,154"></path>
-    <path fill="none" stroke="#000000" d="M94,181L94,166"></path>
-    <path fill="none" stroke="#000000" d="M94,166L79,166"></path>
-    <path fill="none" stroke="#000000" d="M106,139L106,154"></path>
-    <path fill="none" stroke="#000000" d="M106,154L121,154"></path>
-    <path fill="none" stroke="#000000" d="M106,181L106,166"></path>
-    <path fill="none" stroke="#000000" d="M106,166L121,166"></path>
-    <path fill="none" stroke="#000000" d="M94,439L94,454"></path>
-    <path fill="none" stroke="#000000" d="M94,454L79,454"></path>
-    <path fill="none" stroke="#000000" d="M94,481L94,466"></path>
-    <path fill="none" stroke="#000000" d="M94,466L79,466"></path>
-    <path fill="none" stroke="#000000" d="M106,439L106,454"></path>
-    <path fill="none" stroke="#000000" d="M106,454L121,454"></path>
-    <path fill="none" stroke="#000000" d="M106,481L106,466"></path>
-    <path fill="none" stroke="#000000" d="M106,466L121,466"></path>
-    <path fill="none" stroke="#000000" d="M454,139L454,154"></path>
-    <path fill="none" stroke="#000000" d="M454,154L439,154"></path>
-    <path fill="none" stroke="#000000" d="M454,181L454,166"></path>
-    <path fill="none" stroke="#000000" d="M454,166L439,166"></path>
-    <path fill="none" stroke="#000000" d="M466,139L466,154"></path>
-    <path fill="none" stroke="#000000" d="M466,154L481,154"></path>
-    <path fill="none" stroke="#000000" d="M466,181L466,166"></path>
-    <path fill="none" stroke="#000000" d="M466,166L481,166"></path>
-    <path fill="none" stroke="#000000" d="M454,439L454,454"></path>
-    <path fill="none" stroke="#000000" d="M454,454L439,454"></path>
-    <path fill="none" stroke="#000000" d="M454,481L454,466"></path>
-    <path fill="none" stroke="#000000" d="M454,466L439,466"></path>
-    <path fill="none" stroke="#000000" d="M466,439L466,454"></path>
-    <path fill="none" stroke="#000000" d="M466,454L481,454"></path>
-    <path fill="none" stroke="#000000" d="M466,481L466,466"></path>
-    <path fill="none" stroke="#000000" d="M466,466L481,466"></path>
-    <path fill="none" stroke="#000000" d="M46,199L46,214"></path>
-    <path fill="none" stroke="#000000" d="M46,214L61,214"></path>
-    <path fill="none" stroke="#000000" d="M46,241L46,226"></path>
-    <path fill="none" stroke="#000000" d="M46,226L61,226"></path>
-    <path fill="none" stroke="#000000" d="M46,379L46,394"></path>
-    <path fill="none" stroke="#000000" d="M46,394L61,394"></path>
-    <path fill="none" stroke="#000000" d="M46,421L46,406"></path>
-    <path fill="none" stroke="#000000" d="M46,406L61,406"></path>
-    <path fill="none" stroke="#000000" d="M154,199L154,214" ></path>
-    <path fill="none" stroke="#000000" d="M154,214L139,214"></path>
-    <path fill="none" stroke="#000000" d="M154,241L154,226"></path>
-    <path fill="none" stroke="#000000" d="M154,226L139,226"></path>
-    <path fill="none" stroke="#000000" d="M166,199L166,214"></path>
-    <path fill="none" stroke="#000000" d="M166,214L181,214"></path>
-    <path fill="none" stroke="#000000" d="M166,241L166,226"></path>
-    <path fill="none" stroke="#000000" d="M166,226L181,226"></path>
-    <path fill="none" stroke="#000000" d="M154,379L154,394"></path>
-    <path fill="none" stroke="#000000" d="M154,394L139,394"></path>
-    <path fill="none" stroke="#000000" d="M154,421L154,406"></path>
-    <path fill="none" stroke="#000000" d="M154,406L139,406"></path>
-    <path fill="none" stroke="#000000" d="M166,379L166,394"></path>
-    <path fill="none" stroke="#000000" d="M166,394L181,394"></path>
-    <path fill="none" stroke="#000000" d="M166,421L166,406"></path>
-    <path fill="none" stroke="#000000" d="M166,406L181,406"></path>
-    <path fill="none" stroke="#000000" d="M274,199L274,214"></path>
-    <path fill="none" stroke="#000000" d="M274,214L259,214"></path>
-    <path fill="none" stroke="#000000" d="M274,241L274,226"></path>
-    <path fill="none" stroke="#000000" d="M274,226L259,226"></path>
-    <path fill="none" stroke="#000000" d="M286,199L286,214"></path>
-    <path fill="none" stroke="#000000" d="M286,214L301,214"></path>
-    <path fill="none" stroke="#000000" d="M286,241L286,226"></path>
-    <path fill="none" stroke="#000000" d="M286,226L301,226"></path>
-    <path fill="none" stroke="#000000" d="M274,379L274,394"></path>
-    <path fill="none" stroke="#000000" d="M274,394L259,394"></path>
-    <path fill="none" stroke="#000000" d="M274,421L274,406"></path>
-    <path fill="none" stroke="#000000" d="M274,406L259,406"></path>
-    <path fill="none" stroke="#000000" d="M286,379L286,394"></path>
-    <path fill="none" stroke="#000000" d="M286,394L301,394"></path>
-    <path fill="none" stroke="#000000" d="M286,421L286,406"></path>
-    <path fill="none" stroke="#000000" d="M286,406L301,406"></path>
-    <path fill="none" stroke="#000000" d="M394,199L394,214"></path>
-    <path fill="none" stroke="#000000" d="M394,214L379,214"></path>
-    <path fill="none" stroke="#000000" d="M394,241L394,226"></path>
-    <path fill="none" stroke="#000000" d="M394,226L379,226"></path>
-    <path fill="none" stroke="#000000" d="M406,199L406,214"></path>
-    <path fill="none" stroke="#000000" d="M406,214L421,214"></path>
-    <path fill="none" stroke="#000000" d="M406,241L406,226"></path>
-    <path fill="none" stroke="#000000" d="M406,226L421,226"></path>
-    <path fill="none" stroke="#000000" d="M394,379L394,394"></path>
-    <path fill="none" stroke="#000000" d="M394,394L379,394"></path>
-    <path fill="none" stroke="#000000" d="M394,421L394,406"></path>
-    <path fill="none" stroke="#000000" d="M394,406L379,406"></path>
-    <path fill="none" stroke="#000000" d="M406,379L406,394"></path>
-    <path fill="none" stroke="#000000" d="M406,394L421,394"></path>
-    <path fill="none" stroke="#000000" d="M406,421L406,406"></path>
-    <path fill="none" stroke="#000000" d="M406,406L421,406"></path>
-    <path fill="none" stroke="#000000" d="M514,199L514,214"></path>
-    <path fill="none" stroke="#000000" d="M514,214L499,214"></path>
-    <path fill="none" stroke="#000000" d="M514,241L514,226"></path>
-    <path fill="none" stroke="#000000" d="M514,226L499,226"></path>
-    <path fill="none" stroke="#000000" d="M514,379L514,394"></path>
-    <path fill="none" stroke="#000000" d="M514,394L499,394"></path>
-    <path fill="none" stroke="#000000" d="M514,421L514,406"></path>
-    <path fill="none" stroke="#000000" d="M514,406L499,406"></path>
+    <g ng-controller="ChessboardCtrl">
+        <rect x="40" y="40" width="480" height="540" fill="none" stroke="#000000" stroke-width="3"></rect>
+        <path ng-repeat="path in pathArr" fill="none" stroke="#000000" ng-attr-d="{{path}}"></path>
+    </g>
 
     <use ng-repeat="chess in game.chesses" ng-attr-x="{{chessX(chess)}}" ng-attr-y="{{chessY(chess)}}" xlink:href="{{symbol(chess)}}"
          ng-click="select(game, chess)"></use>

@@ -21,43 +21,56 @@
     <script type="text/javascript" src="js/service/console.js"></script>
 
     <script type="text/javascript" src="js/leancloud/config.js"></script>
+    <script type="text/javascript" src="js/leancloud/service/user.js"></script>
     <script type="text/javascript" src="js/leancloud/service/room.js"></script>
     <script type="text/javascript" src="js/leancloud/vm/chess.js"></script>
 </head>
 <body ng-app="ng-chinese-chess">
     <div ng-controller="ChessCtrl">
-        <div ng-if="!user">
+        <div ng-if="!currentUser">
             <form class="pure-form pure-form-aligned">
                 <fieldset>
                     <div class="pure-control-group">
-                        <label for="name">Username</label>
-                        <input id="name" type="text" placeholder="Username" ng-model="username">
+                        <label>Username</label>
+                        <input type="text" placeholder="Username" ng-model="user.username">
                     </div>
 
                     <div class="pure-control-group">
-                        <label for="password">Password</label>
-                        <input id="password" type="password" placeholder="Password" ng-model="password">
-                    </div>
-
-                    <div class="pure-control-group">
-                        <label for="email">Email Address</label>
-                        <input id="email" type="email" placeholder="Email Address" ng-model="email">
+                        <label>Password</label>
+                        <input type="password" placeholder="Password" ng-model="user.password">
                     </div>
 
                     <div class="pure-controls">
-                        <label for="cb" class="pure-checkbox">
-                            <input id="cb" type="checkbox"> I've read the terms and conditions
-                        </label>
-
-                        <button type="submit" class="pure-button pure-button-primary">Submit</button>
+                        <button type="submit" class="pure-button pure-button-default" ng-click="signUp()">Sign up</button>
+                        <button type="submit" class="pure-button pure-button-primary" ng-click="signIn()">Sign In</button>
                     </div>
                 </fieldset>
             </form>
         </div>
-        <div ng-if="user">
-            <ul>
-                <li ng-repeat="room in rooms">{{room.createdAt}}</li>
-            </ul>
+        <div ng-if="currentUser" ng-init="loadRooms()">
+            <table>
+                <thead>
+                <tr>
+                    <th>Red Player</th>
+                    <th>Black Player</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="room in rooms">
+                    <td>
+                        <div>{{room.redPlayer}}</div>
+                    </td>
+                    <td>
+                        <div ng-hide="canJoin(room)">{{room.blackPlayer}}</div>
+                        <button ng-show="canJoin(room)" ng-click="join(room)">Join this game</button>
+                    </td>
+                    <td>
+                        <button ng-show="canWatch(room)" ng-click="watch(room)">Watch this game</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
 
             <button ng-click="createGame()">Create</button>
         </div>

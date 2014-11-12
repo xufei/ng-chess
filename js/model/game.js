@@ -305,11 +305,11 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
             };
 
             if (this.redPlayer) {
-                json.redPlayer = this.redPlayer.user.name;
+                json.redPlayer = this.redPlayer.user.get("username");
             }
 
             if (this.blackPlayer) {
-                json.blackPlayer = this.blackPlayer.user.name;
+                json.blackPlayer = this.blackPlayer.user.get("username");
             }
 
             return json;
