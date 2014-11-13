@@ -1,6 +1,9 @@
 angular.module("ng-chinese-chess").controller("ChessboardCtrl",
     ["$scope", "offsetX", "offsetY", "gridSize",
         function ($scope, offsetX, offsetY, gridSize) {
+            $scope.offsetX = offsetX;
+            $scope.offsetY = offsetY;
+            $scope.gridSize = gridSize;
             $scope.pathArr = [];
 
             init();

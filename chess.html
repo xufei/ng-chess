@@ -123,7 +123,8 @@
     </defs>
 
     <g ng-controller="ChessboardCtrl">
-        <rect x="40" y="40" width="480" height="540" fill="none" stroke="#000000" stroke-width="3"></rect>
+        <rect ng-attr-x="{{offsetX}}" ng-attr-y="{{offsetY}}" ng-attr-width="{{gridSize*8}}" ng-attr-height="{{gridSize*9}}"
+              fill="none" stroke="#000000" stroke-width="3"></rect>
         <path ng-repeat="path in pathArr" fill="none" stroke="#000000" ng-attr-d="{{path}}"></path>
     </g>
 

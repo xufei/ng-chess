@@ -1,5 +1,5 @@
-angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType", "ChessColor", "GameState", "ConsoleLogger",
-    function (Factory, Type, Color, GameState, ConsoleLogger) {
+angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType", "ChessColor", "GameState",
+    function (Factory, Type, Color, GameState) {
     //color, type, x, y
     var chesses = [
         [1, 7, 4, 9],
@@ -197,45 +197,16 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
             this.chessUnderAttack = [];
         },
 
-        moveChess: function (chess, newX, newY, isUndo) {
-            var dead = this.situation[newX][newY];
+        moveChess: function (chess, newX, newY) {
             var step = {
-                chess: chess,
-                from: {
-                    x: chess.x,
-                    y: chess.y
-                },
-                dead: dead
+                fromX: chess.x,
+                fromY: chess.y,
+                toX: newX,
+                toY: newY
             };
 
-            if (isUndo) {
-                this.redoList.push(step);
-            }
-            else {
-                this.undoList.push(step);
-            }
+            this.executeStep(step);
 
-            this.situation[chess.x][chess.y] = null;
-            chess.x = newX;
-            chess.y = newY;
-            this.situation[newX][newY] = chess;
-
-            if (dead) {
-                for (var i = 0; i < this.chesses.length; i++) {
-                    if (dead == this.chesses[i]) {
-                        this.chesses.splice(i, 1);
-                        break;
-                    }
-                }
-            }
-
-            this.currentPlayer = (this.currentPlayer == this.redPlayer) ? this.blackPlayer : this.redPlayer;
-
-            this.currentChess = null;
-            this.moveablePlaces = [];
-            this.chessUnderAttack = [];
-
-            this.log(step);
             this.check();
         },
 
@@ -276,18 +247,54 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
             });
         },
 
-        executeStep: function (step) {
-            this.moveChess(step.chess, step.from.x, step.from.y);
+        executeStep: function (step, isUndo) {
+            var chess = this.situation[step.fromX][step.fromY];
+            var killedChess = this.situation[step.toX][step.toY];
+            delete this.situation[step.fromX][step.fromY];
+            this.situation[step.toX][step.toY] = chess;
 
-            if (step.dead) {
-                this.situation[step.chess.x][step.chess.y] = step.dead;
+            if (killedChess) {
+                for (var i = 0; i < this.chesses.length; i++) {
+                    if (killedChess == this.chesses[i]) {
+                        this.chesses.splice(i, 1);
+                        break;
+                    }
+                }
             }
+
+            if (isUndo) {
+                if (step.deadColor) {
+                    var deadChess = ChessFactory.createChess([step.deadColor, step.deadType, step.fromX, step.fromY]);
+                    this.situation[step.fromX][step.fromY] = deadChess;
+
+                    this.chesses.push(deadChess);
+                }
+
+                this.redoList.push(step);
+            }
+            else {
+                if (killedChess) {
+                    step.deadType = killedChess.type;
+                    step.deadColor = killedChess.color;
+                }
+                this.undoList.push(step);
+            }
+
+            this.currentPlayer = (this.currentPlayer == this.redPlayer) ? this.blackPlayer : this.redPlayer;
+
+            this.currentChess = null;
+            this.moveablePlaces = [];
+            this.chessUnderAttack = [];
+
+            this.log(step);
+
+            this.notify(step);
         },
 
         undo: function () {
             if (this.undoList.length > 0) {
                 var step = this.undoList.pop();
-                this.executeStep(step);
+                this.executeStep(step, true);
             }
         },
 

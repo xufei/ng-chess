@@ -1,10 +1,27 @@
 angular.module("ng-chinese-chess").controller("ChessCtrl",
-    ["$scope", "offsetX", "offsetY", "gridSize", "ChessColor", "Game", "Player", "RoomService", "UserService", "ConsoleLogger",
-    function ($scope, offsetX, offsetY, gridSize, Color, Game, Player, RoomService, UserService, ConsoleLogger) {
+    ["$scope", "offsetX", "offsetY", "gridSize", "ChessColor", "Game", "Player", "Watcher", "RoomService", "UserService", "ConsoleLogger", "$timeout",
+    function ($scope, offsetX, offsetY, gridSize, Color, Game, Player, Watcher, RoomService, UserService, ConsoleLogger, $timeout) {
         var room = RoomService.createRoom();
 
         var rooms = RoomService.rooms();
+
         $scope.rooms = [];
+        $scope.games = [];
+
+        $scope.currentGame = null;
+
+        $scope.switchGame = function(game) {
+            $scope.currentGame = game;
+        };
+
+        $scope.gameClass = function(game) {
+            if (game == this.currentGame) {
+                return "pure-menu-selected";
+            }
+            else {
+                return "";
+            }
+        };
 
         var user = {};
         $scope.user = user;
@@ -14,6 +31,8 @@ angular.module("ng-chinese-chess").controller("ChessCtrl",
             UserService.signUp(user.username, user.password)
                 .then(function(result) {
                     $scope.currentUser = result;
+                    $scope.loadRooms();
+
                     alert("A new user is created.");
                 });
         };
@@ -22,20 +41,29 @@ angular.module("ng-chinese-chess").controller("ChessCtrl",
             UserService.signIn(user.username, user.password)
                 .then(function(result) {
                     $scope.currentUser = result;
+                    $scope.loadRooms();
+
                     alert("Logged in.");
                 });
         };
 
         $scope.createGame = function () {
             var game = new Game();
-            game.redPlayer = new Player($scope.currentUser, Color.RED);
+            var player = new Player($scope.currentUser, Color.RED);
+            player.game = game;
+            game.redPlayer = player;
             game.init();
 
             game.addLogger(ConsoleLogger);
 
+            $scope.games.push(game);
+
             room.save(game.serialize(), {
-                success: function (object) {
+                success: function (room) {
                     alert("New Room created!");
+
+                    var steps = $scope.loadSteps(room);
+                    $scope.loadSteps(steps);
                 }
             });
         };
@@ -61,11 +89,21 @@ angular.module("ng-chinese-chess").controller("ChessCtrl",
         };
 
         $scope.join = function(room) {
+            var game = new Game();
+            var player = new Player($scope.currentUser, Color.BLACK);
+            player.game = game;
+            game.blackPlayer = player;
 
+            $scope.games.push(game);
         };
 
         $scope.watch = function(room) {
+            var game = new Game();
+            var watcher = new Watcher();
 
+            game.addWatcher(watcher);
+
+            $scope.games.push(game);
         };
 
         $scope.loadRooms = function() {
@@ -79,6 +117,20 @@ angular.module("ng-chinese-chess").controller("ChessCtrl",
                 },
                 error: function(collection, error) {
                     // 怎么会读不到
+                }});
+        };
+
+        $scope.loadSteps = function(steps) {
+            steps.fetch({
+                success: function(collection) {
+                    collection.each(function(object) {
+                        $scope.rooms.push(object.attributes);
+                    });
+
+                    $scope.$digest();
+                },
+                error: function(collection, error) {
+                    // 不可能吧
                 }});
         };
 

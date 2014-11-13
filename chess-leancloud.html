@@ -47,8 +47,8 @@
                 </fieldset>
             </form>
         </div>
-        <div ng-if="currentUser" ng-init="loadRooms()">
-            <table>
+        <div ng-if="currentUser">
+            <table class="pure-table pure-table-bordered">
                 <thead>
                 <tr>
                     <th>Red Player</th>
@@ -73,6 +73,14 @@
             </table>
 
             <button ng-click="createGame()">Create</button>
+
+            <div class="pure-menu pure-menu-open pure-menu-horizontal">
+                <ul>
+                    <li ng-repeat="game in games" ng-class="gameClass(game)" ng-click="switchGame(game)">
+                        <a href="#">Game</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 
