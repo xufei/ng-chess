@@ -5,11 +5,11 @@ angular.module("ng-chinese-chess").controller("ChessCtrl", ["$scope", "offsetX",
         $scope.createGame = function () {
             var game = new Game();
 
-            var redPlayer = new Player(Color.RED);
+            var redPlayer = new Player(null, Color.RED);
             redPlayer.game = game;
             game.redPlayer = redPlayer;
 
-            var blackPlayer = new Player(Color.BLACK);
+            var blackPlayer = new Player(null, Color.BLACK);
             blackPlayer.game = game;
             game.blackPlayer = blackPlayer;
 

@@ -232,8 +232,9 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
         },
 
         log: function (step) {
+            var chess = this.situation[step.toX][step.toY];
             angular.forEach(this.loggers, function (logger) {
-                logger.log(step);
+                logger.log(chess, step);
             });
         },
 
@@ -252,6 +253,8 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
             var killedChess = this.situation[step.toX][step.toY];
             delete this.situation[step.fromX][step.fromY];
             this.situation[step.toX][step.toY] = chess;
+            chess.x = step.toX;
+            chess.y = step.toY;
 
             if (killedChess) {
                 for (var i = 0; i < this.chesses.length; i++) {
