@@ -44,15 +44,15 @@ angular.module("ng-chinese-chess").controller("ChessCtrl", ["$scope", "offsetX",
         };
 
         $scope.select = function (game, chess) {
-            game.select(chess);
+            game.currentPlayer.select(chess);
         };
 
         $scope.move = function (game, position) {
-            game.moveTo(position);
+            game.currentPlayer.move(position);
         };
 
         $scope.attack = function (game, position) {
-            game.attack(position);
+            game.currentPlayer.attack(position);
         };
 
         var colors = {
