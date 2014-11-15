@@ -38,4 +38,8 @@ angular.module("ng-chinese-chess", [])
         FINISHED: 0,
         READY: 1,
         ACTING: 2
+    })
+    .value("PlayerType", {
+        LOCAL: 0,
+        REMOTE: 1
     });

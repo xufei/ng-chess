@@ -4,8 +4,7 @@ angular.module("ng-chinese-chess").service("RoomService", [function () {
     var Room = AV.Object.extend("Room");
 
     var RoomCollection = AV.Collection.extend({
-        model: Room,
-        query: (new AV.Query(Room)).equalTo("state", -1)
+        model: Room
     });
 
     var rooms = new RoomCollection();
@@ -32,7 +31,6 @@ angular.module("ng-chinese-chess").service("RoomService", [function () {
         addStep: function(room, data) {
             var step = new Step();
 
-            step.set("chess", data.chess);
             step.set("fromX", data.fromX);
             step.set("fromY", data.fromY);
             step.set("toX", data.toX);

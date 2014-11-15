@@ -1,8 +1,9 @@
 angular.module("ng-chinese-chess").factory("Player", [function () {
-    function Player(user, color) {
+    function Player(user, color, type) {
         this.game = null;
         this.user = user;
         this.color = color;
+        this.type = type;
     }
 
     Player.prototype = {

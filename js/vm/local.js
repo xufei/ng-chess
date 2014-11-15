@@ -1,15 +1,15 @@
-angular.module("ng-chinese-chess").controller("ChessCtrl", ["$scope", "offsetX", "offsetY", "gridSize", "ChessColor", "Game", "Player", "ConsoleLogger",
-    function ($scope, offsetX, offsetY, gridSize, Color, Game, Player, ConsoleLogger) {
+angular.module("ng-chinese-chess").controller("ChessCtrl", ["$scope", "offsetX", "offsetY", "gridSize", "ChessColor", "PlayerType", "Game", "Player", "ConsoleLogger",
+    function ($scope, offsetX, offsetY, gridSize, Color, Game, Player, PlayerType, ConsoleLogger) {
         $scope.games = [];
 
         $scope.createGame = function () {
             var game = new Game();
 
-            var redPlayer = new Player(null, Color.RED);
+            var redPlayer = new Player("Local Player 1", Color.RED, PlayerType.LOCAL);
             redPlayer.game = game;
             game.redPlayer = redPlayer;
 
-            var blackPlayer = new Player(null, Color.BLACK);
+            var blackPlayer = new Player("Local Player 2", Color.BLACK, PlayerType.LOCAL);
             blackPlayer.game = game;
             game.blackPlayer = blackPlayer;
 

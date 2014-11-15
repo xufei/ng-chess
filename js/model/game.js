@@ -1,5 +1,5 @@
-angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType", "ChessColor", "GameState",
-    function (Factory, Type, Color, GameState) {
+angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType", "ChessColor", "GameState", "PlayerType",
+    function (Factory, Type, Color, GameState, PlayerType) {
     //color, type, x, y
     var chesses = [
         [1, 7, 4, 9],
@@ -165,6 +165,11 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
                 return;
             }
 
+            if (this.currentPlayer.type != PlayerType.LOCAL) {
+                this.prompt("等待远程棋手落子！");
+                return;
+            }
+
             if (chess.color != this.currentPlayer.color) {
                 this.prompt("不该你走！");
                 return;
@@ -194,9 +199,11 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
         },
 
         moveTo: function (position) {
-            this.moveChess(this.currentChess, position.x, position.y);
+            var step = this.moveChess(this.currentChess, position.x, position.y);
             this.moveablePlaces = [];
             this.chessUnderAttack = [];
+
+            return step;
         },
 
         moveChess: function (chess, newX, newY) {
@@ -210,6 +217,8 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
             this.executeStep(step);
 
             this.check();
+
+            return step;
         },
 
         check: function () {
@@ -327,11 +336,11 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
             };
 
             if (this.redPlayer) {
-                json.redPlayer = this.redPlayer.user.get("username");
+                json.redPlayer = this.redPlayer.user;
             }
 
             if (this.blackPlayer) {
-                json.blackPlayer = this.blackPlayer.user.get("username");
+                json.blackPlayer = this.blackPlayer.user;
             }
 
             return json;
