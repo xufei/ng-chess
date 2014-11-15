@@ -141,22 +141,14 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
                     }
 
                     if (canKill) {
-                        this.moveChess(this.currentChess, chess.x, chess.y, false);
-
-                        if (chess.type == Type.GENERAL) {
-                            var winner = (chess.color == Color.RED) ? "黑" : "红";
-                            this.prompt("结束啦，" + winner + "方胜利！");
-                            this.state = GameState.FINISHED;
-                        }
-                        return;
+                        var step = this.moveChess(this.currentChess, chess.x, chess.y, false);
+                        return step;
                     }
                     else {
                         this.prompt("吃不到这个棋子！");
                         return;
                     }
                 }
-            }
-            else {
             }
         },
 
@@ -216,8 +208,6 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
 
             this.executeStep(step);
 
-            this.check();
-
             return step;
         },
 
@@ -260,7 +250,7 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
         },
         
         processHistory: function(history) {
-            var newSteps = history.splice(0, this.history.length-1);
+            var newSteps = history.slice(this.history.length, history.length);
             var game = this;
             newSteps.forEach(function(step) {
                 game.executeStep(step);
@@ -281,6 +271,12 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
                         this.chesses.splice(i, 1);
                         break;
                     }
+                }
+
+                if (killedChess.type == Type.GENERAL) {
+                    var winner = (killedChess.color == Color.RED) ? "黑" : "红";
+                    this.prompt("结束啦，" + winner + "方胜利！");
+                    this.state = GameState.FINISHED;
                 }
             }
 
@@ -309,6 +305,8 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
             this.chessUnderAttack = [];
             
             this.history.push(step);
+
+            this.check();
 
             this.log(step);
 

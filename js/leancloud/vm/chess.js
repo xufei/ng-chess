@@ -96,7 +96,7 @@ angular.module("ng-chinese-chess").controller("ChessCtrl",
                 redPlayer.game = game;
                 game.redPlayer = redPlayer;
 
-                var blackPlayer = new Player($scope.currentUser.get("username", Color.BLACK), PlayerType.LOCAL);
+                var blackPlayer = new Player($scope.currentUser.get("username"), Color.BLACK, PlayerType.LOCAL);
                 blackPlayer.game = game;
                 game.blackPlayer = blackPlayer;
 
@@ -148,12 +148,15 @@ angular.module("ng-chinese-chess").controller("ChessCtrl",
             $scope.watchRoomChange = function () {
                 $scope.rooms.each(function (room) {
                     if (room.get("state") == GameState.READY) {
+                        var username = $scope.currentUser.get("username");
                         var game = new Game();
-                        var redPlayer = new Player(room.get("redPlayer"), Color.RED, PlayerType.LOCAL);
+                        var redPlayer = new Player(room.get("redPlayer"), Color.RED,
+                            (room.get("redPlayer")==username) ? PlayerType.LOCAL: PlayerType.REMOTE);
                         redPlayer.game = game;
                         game.redPlayer = redPlayer;
 
-                        var blackPlayer = new Player(room.get("blackPlayer"), Color.BLACK, PlayerType.LOCAL);
+                        var blackPlayer = new Player(room.get("blackPlayer"), Color.BLACK,
+                            (room.get("blackPlayer")==username) ? PlayerType.LOCAL: PlayerType.REMOTE);
                         blackPlayer.game = game;
                         game.blackPlayer = blackPlayer;
                         game.init();
@@ -170,6 +173,8 @@ angular.module("ng-chinese-chess").controller("ChessCtrl",
                                 $scope.loadSteps(game, steps);
                             }
                         });
+
+                        roomMap[game] = room;
                     }
                 });
             };
@@ -233,7 +238,11 @@ angular.module("ng-chinese-chess").controller("ChessCtrl",
             };
 
             $scope.attack = function (game, position) {
-                game.attack(position);
+                var step = game.attack(position);
+
+                var room = roomMap[game];
+
+                RoomService.addStep(room, step);
             };
 
             var colors = {
