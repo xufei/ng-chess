@@ -62,8 +62,8 @@ angular.module("ng-chinese-chess").controller("ChessCtrl",
                 success: function (room) {
                     alert("New Room created!");
 
-                    var steps = $scope.loadSteps(room);
-                    $scope.loadSteps(steps);
+                    var steps = RoomService.loadSteps(room);
+                    $scope.loadSteps(game, steps);
                 }
             });
         };
@@ -120,12 +120,15 @@ angular.module("ng-chinese-chess").controller("ChessCtrl",
                 }});
         };
 
-        $scope.loadSteps = function(steps) {
+        $scope.loadSteps = function(game, steps) {
             steps.fetch({
                 success: function(collection) {
+                    var history = [];
                     collection.each(function(object) {
-                        $scope.rooms.push(object.attributes);
+                        history.push(object.attributes);
                     });
+                    
+                    game.processHistory(history);
 
                     $scope.$digest();
                 },

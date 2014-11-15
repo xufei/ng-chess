@@ -41,6 +41,8 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
         this.initialSituation = chesses;
 
         this.state = GameState.UNINITIALIZED;
+        
+        this.history = [];
 
         this.situation = [];
 
@@ -247,6 +249,14 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
                 watcher.notify(step);
             });
         },
+        
+        processHistory: function(history) {
+            var newSteps = history.splice(0, this.history.length-1);
+            var game = this;
+            newSteps.forEach(function(step) {
+                game.executeStep(step);
+            });
+        },
 
         executeStep: function (step, isUndo) {
             var chess = this.situation[step.fromX][step.fromY];
@@ -288,6 +298,8 @@ angular.module("ng-chinese-chess").factory("Game", ["ChessFactory", "ChessType",
             this.currentChess = null;
             this.moveablePlaces = [];
             this.chessUnderAttack = [];
+            
+            this.history.push(step);
 
             this.log(step);
 
