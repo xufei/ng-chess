@@ -1,5 +1,5 @@
 angular.module("ng-chinese-chess").controller("ChessCtrl", ["$scope", "offsetX", "offsetY", "gridSize", "ChessColor", "PlayerType", "Game", "Player", "ConsoleLogger",
-    function ($scope, offsetX, offsetY, gridSize, Color, Game, Player, PlayerType, ConsoleLogger) {
+    function ($scope, offsetX, offsetY, gridSize, Color, PlayerType, Game, Player, ConsoleLogger) {
         $scope.games = [];
 
         $scope.createGame = function () {
