@@ -33,14 +33,14 @@ angular.module("ng-chinese-chess").controller("ChessboardCtrl",
                 // 炮位
                 for (i = 0; i < 2; i++) {
                     for (j = 0; j < 2; j++) {
-                        pathArr.concat(drawStar(1 + i * 6, 2 + j * 5));
+                        pathArr = pathArr.concat(drawStar(1 + i * 6, 2 + j * 5));
                     }
                 }
 
                 // 兵位
                 for (i = 0; i < 5; i++) {
                     for (j = 0; j < 2; j++) {
-                        pathArr.concat(drawStar(i * 2, 3 + j * 3));
+                        pathArr = pathArr.concat(drawStar(i * 2, 3 + j * 3));
                     }
                 }
 
