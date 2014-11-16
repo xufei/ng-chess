@@ -1,6 +1,6 @@
 angular.module("ng-chinese-chess").controller("ChessCtrl",
-    ["$scope", "offsetX", "offsetY", "gridSize", "ChessColor", "GameState", "PlayerType", "Game", "Player", "Watcher", "RoomService", "UserService", "ConsoleLogger", "$timeout",
-        function ($scope, offsetX, offsetY, gridSize, Color, GameState, PlayerType, Game, Player, Watcher, RoomService, UserService, ConsoleLogger, $timeout) {
+    ["$scope", "offsetX", "offsetY", "gridSize", "ChessColor", "GameState", "PlayerType", "Game", "Player", "RoomService", "UserService", "ConsoleLogger", "$timeout",
+        function ($scope, offsetX, offsetY, gridSize, Color, GameState, PlayerType, Game, Player, RoomService, UserService, ConsoleLogger, $timeout) {
             $scope.rooms = RoomService.rooms();
             $scope.games = [];
 
@@ -71,7 +71,7 @@ angular.module("ng-chinese-chess").controller("ChessCtrl",
 
             $scope.canJoin = function (room) {
                 var username = $scope.currentUser.get("username");
-                if ((room.get("redPlayer") != username) && room.get("blackPlayer") != username) {
+                if ((room.get("state") == GameState.UNINITIALIZED) && (room.get("redPlayer") != username) && room.get("blackPlayer") != username) {
                     return true;
                 }
                 else {
@@ -120,12 +120,23 @@ angular.module("ng-chinese-chess").controller("ChessCtrl",
 
             $scope.watch = function (room) {
                 var game = new Game();
-                var watcher = new Watcher();
+
+                var redPlayer = new Player(room.get("redPlayer"), Color.RED, PlayerType.REMOTE);
+                redPlayer.game = game;
+                game.redPlayer = redPlayer;
+
+                var blackPlayer = new Player(room.get("blackPlayer"), Color.BLACK, PlayerType.REMOTE);
+                blackPlayer.game = game;
+                game.blackPlayer = blackPlayer;
+
                 game.init();
 
-                game.addWatcher(watcher);
-
                 $scope.games.push(game);
+
+                var steps = RoomService.getSteps(room);
+                $scope.loadSteps(game, steps);
+
+                roomMap[game] = room;
             };
 
             $scope.loadRooms = function () {
@@ -147,8 +158,8 @@ angular.module("ng-chinese-chess").controller("ChessCtrl",
 
             $scope.watchRoomChange = function () {
                 $scope.rooms.each(function (room) {
-                    if (room.get("state") == GameState.READY) {
-                        var username = $scope.currentUser.get("username");
+                    var username = $scope.currentUser.get("username");
+                    if ((room.get("state") == GameState.READY) && (room.get("redPlayer") == username)) {
                         var game = new Game();
                         var redPlayer = new Player(room.get("redPlayer"), Color.RED,
                             (room.get("redPlayer")==username) ? PlayerType.LOCAL: PlayerType.REMOTE);
