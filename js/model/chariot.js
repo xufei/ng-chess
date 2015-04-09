@@ -16,7 +16,7 @@ angular.module("ng-chinese-chess").factory("Chariot", ["ChessMan", "ChessType", 
                 else {
                     if (this.y == y) {
                         if (this.x < x) {
-                            for (var i = this.i + 1; i < x; i++) {
+                            for (var i = this.x + 1; i < x; i++) {
                                 if (!this.game.isEmpty(i, this.y)) {
                                     return false;
                                 }
